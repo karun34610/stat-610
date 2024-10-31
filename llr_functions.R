@@ -13,6 +13,7 @@ compute_f_hat <- function(z,x,y,omega) {
   Wz = make_weight_matrix(z, x, omega) 
   X = make_predictor_matrix(x)
   XWz <- apply(X, 2, function(col, i){col * Wz}, Wz)
+  yWz <- mapply('*',y,Wz)
   f_hat = c(1, z) %*% solve(t(X) %*% XWz) %*% t(X) %*% yWz
   return(f_hat)
   
