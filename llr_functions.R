@@ -12,7 +12,8 @@ compute_f_hat <- function(z,x,y,omega) {
   
   Wz = make_weight_matrix(z, x, omega) 
   X = make_predictor_matrix(x)
-  f_hat = c(1, z) %*% solve(t(X) %*% Wz %*% X) %*% t(X) %*% Wz %*% y
+  XWz <- apply(X, 2, function(col, i){col * Wz}, Wz)
+  f_hat = c(1, z) %*% solve(t(X) %*% XWz) %*% t(X) %*% yWz
   return(f_hat)
   
 }
@@ -20,10 +21,10 @@ compute_f_hat <- function(z,x,y,omega) {
 
 make_weight_matrix  <- function(z,x,omega){
   n = length(x)
-  p <- matrix(rep(0,n^2),n,n)
+  p <- c(rep(0,n))
   for (i in 1:n){
     r <- abs(x[i]-z)/omega
-    p[i,i] <- w_fun(r)
+    p[i] <- w_fun(r)
   }
   return(p)
 }
@@ -39,8 +40,9 @@ make_predictor_matrix <- function(x) {
   return(a)
 }
 
+
 data(french_fries) 
 french_fries = french_fries[complete.cases(french_fries),] 
 z = seq(0, 15, length.out = 100) 
-fits = llr(z = z, x = french_fries$potato, y = french_fries$buttery, omega = 2) 
+fits = llr(z = z, x = french_fries$potato, y = french_fries$buttery, omega = 3) 
 plot(z, fits)
